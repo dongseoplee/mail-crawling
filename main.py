@@ -1,63 +1,35 @@
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import os
-import json
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
+import pyperclip
+import time
 
+#input 데이터를 pyperclip 이용해 copy & paste하여 xpath로 전달
+def copy_input(xpath, input):
+    pyperclip.copy(input)
+    driver.find_element_by_xpath(xpath).click() #Please use find_element(by=By.XPATH, value=xpath) instead
+    ActionChains(driver).key_down(Keys.CONTROL).send_keys('v').key_up(Keys.CONTROL).perform()
+    time.sleep(1)
+
+#id, password
+#Warning! private information
+id = '****'
+pw = '*********'
+#크롬 드라이버 열기
+driver = webdriver.Chrome('c:\chromedriver.exe')
+driver.implicitly_wait(3)
+
+#url 열기
 URL = 'https://nid.naver.com/nidlogin.login?mode=form&url=https%3A%2F%2Fwww.naver.com'
+driver.get(URL)
 
-def main():
-    try:
-        driver = getDriver()
-        driver.get(URL)
+#id, password copy_input 함수통해 copy & paste
+copy_input('//*[@id="id"]', id)
+time.sleep(1)
+copy_input('//*[@id="pw"]', pw)
+time.sleep(1)
 
-        config = getConfig()
+#로그인 버튼 클릭
+driver.find_element_by_xpath('//*[@id="log.login"]').click()
 
-        naverLogin(driver, config['userId'], config['userPw'])
-
-    except Exception as e:
-        print(str(e))
-    else:
-        print("Main process is done.")
-    finally:
-        os.system("Pause")
-        driver.quit()
-
-
-def getConfig():
-    try:
-        with open('config.json') as jsonFile:
-            jsonData = json.load(jsonFile)
-    except Exception as e:
-        print("Error in reading config file, {}".format(e))
-        return None
-    else:
-        return jsonData
-
-def naverLogin(driver, id, pw):
-    element = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.CSS_SELECTOR, "#id"))
-    )
-    element.send_keys(id)
-
-    element = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.CSS_SELECTOR, "#pw"))
-    )
-    element.send_keys(pw)
-
-    element = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.CSS_SELECTOR, "input.btn_global"))
-    )
-    element.click()
-
-    return False
-
-def getDriver():
-    driver = webdriver.Chrome(r'C:\chromedriver.exe')
-    driver.implicitly_wait(3)
-    return driver
-
-if __name__=='__name__':
-    main()
 
