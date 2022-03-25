@@ -32,4 +32,7 @@ time.sleep(1)
 #로그인 버튼 클릭
 driver.find_element_by_xpath('//*[@id="log.login"]').click()
 
+#Test
+#Test2
+
 
